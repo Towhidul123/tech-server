@@ -29,7 +29,7 @@ async function run() {
    // await client.connect();
 
     const menuCollection = client.db("techDB").collection("techProduct");
-
+    const reviewsCollection = client.db("techDB").collection("reviews");
 
     // Get all documents from collection
     app.get('/menu', async(req,res)=>{
@@ -63,7 +63,17 @@ async function run() {
       }
     });
 
-    
+    //reviews
+  app.post('/reviews', async (req, res) => {
+    try {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    } catch (error) {
+      console.error('Error adding review:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 
 
     // Send a ping to confirm a successful connection
