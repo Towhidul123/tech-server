@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require ('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -38,6 +38,30 @@ async function run() {
     })
 
 
+    //api based on ID
+    app.get('/products/:productId', async (req, res) => {
+      const productId = req.params.productId;
+
+      console.log('Received productId:', productId);
+
+      try {
+        const query = { _id: new ObjectId(productId) };
+        //console.log(query);
+        const result = await menuCollection.findOne(query);
+        // console.log(result);
+
+        if (!result) {
+          res.status(404).json({ error: 'Product not found' });
+          return;
+        }
+
+        res.json(result);
+
+      } catch (error) {
+        console.error('Error fetching product details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
 
     
 
