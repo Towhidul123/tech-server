@@ -31,6 +31,27 @@ async function run() {
     const menuCollection = client.db("techDB").collection("techProduct");
     const reviewsCollection = client.db("techDB").collection("reviews");
     const userProduct = client.db("techDB").collection("userProduct");
+    const UserCollection = client.db("techDB").collection("users");
+
+
+    //insert email
+
+    app.post('/users', async(req,res)=>{
+      const user = req.body;
+      const query = {email: user.email}
+      const existingUser = await UserCollection.findOne(query);
+     
+      if (existingUser) {
+        return res.status(409).json({ error: 'User with this email already exists' });
+    }
+      const result = await UserCollection.insertOne(user);
+      res.send(result);
+    })
+
+    app.get('/users', async(req,res)=>{
+      const result = await UserCollection.find().toArray();
+      res.send(result);
+    })
 
     // Get all documents from collection
     app.get('/menu', async(req,res)=>{
@@ -115,6 +136,26 @@ async function run() {
     }
   });
 
+  //menu related api
+  app.delete('/users/:id', async (req,res) =>{
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)}
+    const result = await UserCollection.deleteOne(query);
+    res.send(result);
+  })
+
+
+  app.patch('/users/admin/:id', async(req,res) =>{
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id) };
+    const updatedDoc = {
+      $set: {
+        role : 'admin'
+      }
+    }
+    const result = await UserCollection.updateOne(filter, updatedDoc)
+    res.send(result);
+  })
   
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
