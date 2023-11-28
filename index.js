@@ -77,6 +77,11 @@ async function run() {
       }
     });
     
+    app.get('/dashboard/userProduct', async (req, res) => {
+      const cursor = userProduct.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
 
     //reviews
